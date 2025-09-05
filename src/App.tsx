@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
+import { generateIcosahedronNeighbors, step } from './ca'
 import './App.css'
 
 function parseRule(text: string): number[] {
@@ -46,34 +47,14 @@ function App() {
     const dodecahedron = new THREE.Mesh(dodecaGeometry, dodecaMaterial)
     scene.add(dodecahedron)
 
-    const icoGeometry = new THREE.IcosahedronGeometry(1)
+    const { vertices, neighbors } = generateIcosahedronNeighbors()
     const sphereGeometry = new THREE.SphereGeometry(0.05, 16, 16)
     const deadMaterial = new THREE.MeshBasicMaterial({ color: 0x222222 })
     const aliveMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 })
-    const positions = icoGeometry.getAttribute('position') as THREE.BufferAttribute
-    const vertices: THREE.Vector3[] = []
-    for (let i = 0; i < positions.count; i++) {
-      const vertex = new THREE.Vector3().fromBufferAttribute(positions, i)
-      if (!vertices.some((v) => v.equals(vertex))) {
-        vertices.push(vertex.clone())
-      }
-    }
-
-    const neighborMap: number[][] = vertices.map(() => [])
-    const index = icoGeometry.index!.array as ArrayLike<number>
-    for (let i = 0; i < index.length; i += 3) {
-      const a = index[i], b = index[i + 1], c = index[i + 2]
-      neighborMap[a].push(b, c)
-      neighborMap[b].push(a, c)
-      neighborMap[c].push(a, b)
-    }
-    neighborMap.forEach((arr, i) => {
-      neighborMap[i] = Array.from(new Set(arr))
-    })
 
     const cells = vertices.map(() => (Math.random() > 0.5 ? 1 : 0))
     cellsRef.current = cells
-    neighborsRef.current = neighborMap
+    neighborsRef.current = neighbors
     const meshes = vertices.map((v, i) => {
       const material = cells[i] ? aliveMaterial.clone() : deadMaterial.clone()
       const sphere = new THREE.Mesh(sphereGeometry, material)
@@ -109,10 +90,7 @@ function App() {
   const tick = useCallback(() => {
     const cells = cellsRef.current
     const neighbors = neighborsRef.current
-    const next = cells.map((cell, i) => {
-      const count = neighbors[i].reduce((sum, n) => sum + cells[n], 0)
-      return cell ? (survive.includes(count) ? 1 : 0) : born.includes(count) ? 1 : 0
-    })
+    const next = step(cells, neighbors, born, survive)
     cellsRef.current = next
     meshesRef.current.forEach((mesh, i) => {
       const mat = mesh.material as THREE.MeshBasicMaterial
