@@ -17,8 +17,8 @@ The latest build is deployed at https://cellular-automaton.vercel.app.
 ### GitHub Pages
 To deploy on GitHub Pages:
 1. Run `pnpm lint`, `pnpm test` and `pnpm build`.
-2. Push the contents of the `dist/` directory to a `gh-pages` branch or the `docs/` folder.
-3. Ensure assets use relative paths so that files resolve correctly.
+2. The build output is written to the `docs/` directory.
+3. Commit and push `docs/` to `main` and configure Pages to serve from that folder.
 
 ## References
 - Platonic solids: https://en.wikipedia.org/wiki/Platonic_solid
