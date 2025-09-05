@@ -4,7 +4,8 @@ import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/cellular-automaton/',
+  // Use a relative base so that built assets can be served from any path
+  base: './',
   plugins: [react()],
   test: {
     environment: 'node',
