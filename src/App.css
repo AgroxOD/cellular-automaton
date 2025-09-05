@@ -4,3 +4,16 @@ html, body, #root, .scene-container {
   margin: 0;
   padding: 0;
 }
+
+.controls {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.8);
+  font-family: sans-serif;
+}
+
+.controls label {
+  margin-right: 8px;
+}
