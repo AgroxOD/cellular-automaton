@@ -7,9 +7,9 @@ export default defineConfig({
   // Use explicit base for GitHub Pages deployment
   base: '/cellular-automaton/',
   plugins: [react()],
-  // Output built files to `docs` so GitHub Pages can serve them
+  // Output built files to `dist` to match deployment workflow
   build: {
-    outDir: 'docs',
+    outDir: 'dist',
   },
   test: {
     environment: 'node',
