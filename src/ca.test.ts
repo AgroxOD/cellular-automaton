@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { generateDodecahedronNeighbors, generateIcosahedronNeighbors, step } from './ca'
+import { generateDodecahedronNeighbors, generateIcosahedronNeighbors, generateFCCLattice, step } from './ca'
 
 describe('generateIcosahedronNeighbors', () => {
   const { neighbors } = generateIcosahedronNeighbors()
@@ -33,6 +33,33 @@ describe('generateDodecahedronNeighbors', () => {
   })
   it('each vertex has 3 neighbors', () => {
     neighbors.forEach((list) => expect(list).toHaveLength(3))
+  })
+  it('neighbor relation is symmetric', () => {
+    neighbors.forEach((list, i) => {
+      const unique = new Set(list)
+      expect(unique.size).toBe(list.length)
+      unique.forEach((n) => {
+        expect(neighbors[n]).toContain(i)
+      })
+    })
+  })
+  it('neighbor order is deterministic', () => {
+    neighbors.forEach((list) => {
+      const sorted = [...list].sort((a, b) => a - b)
+      expect(list).toEqual(sorted)
+    })
+  })
+})
+
+describe('generateFCCLattice', () => {
+  const { positions, neighbors } = generateFCCLattice(1)
+  const coords = positions.map((v) => [v.x, v.y, v.z])
+  it('positions have even parity', () => {
+    coords.forEach(([x, y, z]) => expect(Math.abs((x + y + z) % 2)).toBe(0))
+  })
+  it('center has 12 neighbors', () => {
+    const center = coords.findIndex(([x, y, z]) => x === 0 && y === 0 && z === 0)
+    expect(neighbors[center]).toHaveLength(12)
   })
   it('neighbor relation is symmetric', () => {
     neighbors.forEach((list, i) => {

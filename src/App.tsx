@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
-import { generateDodecahedronNeighbors, step } from './ca'
+import { generateFCCLattice, step } from './ca'
 import './App.css'
 
 const DEFAULT_BORN = [3]
@@ -28,7 +28,7 @@ function App() {
   const mountRef = useRef<HTMLDivElement | null>(null)
   const cellsRef = useRef<number[]>([])
   const neighborsRef = useRef<number[][]>([])
-  const meshesRef = useRef<THREE.Mesh[]>([])
+  const meshRef = useRef<THREE.InstancedMesh | null>(null)
   const bufferRef = useRef<number[]>([])
   const [bornText, setBornText] = useState('3')
   const [surviveText, setSurviveText] = useState('2,3')
@@ -73,33 +73,38 @@ function App() {
     renderer.setSize(width, height)
     container.appendChild(renderer.domElement)
 
-    const dodecaGeometry = new THREE.DodecahedronGeometry(1)
-    const dodecaMaterial = new THREE.MeshNormalMaterial({ wireframe: true })
-    const dodecahedron = new THREE.Mesh(dodecaGeometry, dodecaMaterial)
-    scene.add(dodecahedron)
-
-    const { vertices, neighbors } = generateDodecahedronNeighbors()
-    const sphereGeometry = new THREE.SphereGeometry(0.05, 16, 16)
-    const deadMaterial = new THREE.MeshBasicMaterial({ color: 0x222222 })
-    const aliveMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 })
-
-    const cells = vertices.map(() => (Math.random() > 0.5 ? 1 : 0))
+    const { positions, neighbors } = generateFCCLattice(3)
+    const sphereGeometry = new THREE.SphereGeometry(0.2, 16, 16)
+    const material = new THREE.MeshBasicMaterial({ vertexColors: true })
+    const mesh = new THREE.InstancedMesh(
+      sphereGeometry,
+      material,
+      positions.length,
+    )
+    const cells = positions.map(() => (Math.random() > 0.5 ? 1 : 0))
     cellsRef.current = cells
     neighborsRef.current = neighbors
     bufferRef.current = new Array(cells.length).fill(0)
-    const meshes = vertices.map((v, i) => {
-      const material = cells[i] ? aliveMaterial.clone() : deadMaterial.clone()
-      const sphere = new THREE.Mesh(sphereGeometry, material)
-      sphere.position.copy(v)
-      scene.add(sphere)
-      return sphere
+    const color = new THREE.Color()
+    const matrix = new THREE.Matrix4()
+    positions.forEach((v, i) => {
+      matrix.setPosition(v)
+      mesh.setMatrixAt(i, matrix)
+      color.set(cells[i] ? 0xff0000 : 0x222222)
+      mesh.setColorAt(i, color)
     })
-    meshesRef.current = meshes
+    mesh.instanceMatrix.needsUpdate = true
+    mesh.instanceColor!.needsUpdate = true
+    scene.add(mesh)
+    meshRef.current = mesh
 
     const animate = () => {
       requestAnimationFrame(animate)
-      dodecahedron.rotation.x += 0.01
-      dodecahedron.rotation.y += 0.01
+      const m = meshRef.current
+      if (m) {
+        m.rotation.x += 0.01
+        m.rotation.y += 0.01
+      }
       renderer.render(scene, camera)
     }
     animate()
@@ -116,19 +121,14 @@ function App() {
       return () => {
         window.removeEventListener('resize', handleResize)
         renderer.dispose()
-        dodecaGeometry.dispose()
-        dodecaMaterial.dispose()
-        meshesRef.current.forEach((mesh) => {
-          mesh.geometry.dispose()
-          if (Array.isArray(mesh.material)) {
-            mesh.material.forEach((m) => m.dispose())
-          } else {
-            mesh.material.dispose()
-          }
-        })
+        if (meshRef.current) {
+          meshRef.current.geometry.dispose()
+          ;(meshRef.current.material as THREE.Material).dispose()
+          scene.remove(meshRef.current)
+          meshRef.current = null
+        }
         cellsRef.current = []
         neighborsRef.current = []
-        meshesRef.current = []
         bufferRef.current = []
         container.removeChild(renderer.domElement)
       }
@@ -141,10 +141,15 @@ function App() {
     const next = step(cells, neighbors, born, survive, buffer)
     bufferRef.current = cells
     cellsRef.current = next
-    meshesRef.current.forEach((mesh, i) => {
-      const mat = mesh.material as THREE.MeshBasicMaterial
-      mat.color.set(next[i] ? 0xff0000 : 0x222222)
-    })
+    const mesh = meshRef.current
+    if (mesh && mesh.instanceColor) {
+      const color = new THREE.Color()
+      next.forEach((v, i) => {
+        color.set(v ? 0xff0000 : 0x222222)
+        mesh.setColorAt(i, color)
+      })
+      mesh.instanceColor.needsUpdate = true
+    }
   }, [born, survive])
 
   useEffect(() => {
