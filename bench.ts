@@ -1,4 +1,5 @@
 import { step } from './src/ca'
+import { performance } from 'perf_hooks'
 
 const N = 100000
 const iterations = 100

@@ -2,6 +2,9 @@
 
 Scaffolded with Vite + React + TypeScript. Includes a Three.js scene rendering a rotating dodecahedron with spheres on its vertices.
 
+## Requirements
+- Node.js 20.19 or newer (or >=22.12)
+
 ## Scripts
 - `pnpm install` installs dependencies.
 - `pnpm run dev` starts a development server at http://localhost:5173.
