@@ -135,4 +135,12 @@ describe('step', () => {
     expect(next[0]).toBe(1)
     expect(cells[0]).toBe(0)
   })
+
+  it('handles duplicate rule entries', () => {
+    const cells = [0, 1, 1, 1]
+    const bornDup = [3, 3]
+    const surviveDup = [2, 3, 3]
+    const next = step(cells, tetraNeighbors, bornDup, surviveDup)
+    expect(next[0]).toBe(1)
+  })
 })
