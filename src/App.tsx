@@ -29,6 +29,7 @@ function App() {
   const cellsRef = useRef<number[]>([])
   const neighborsRef = useRef<number[][]>([])
   const meshesRef = useRef<THREE.Mesh[]>([])
+  const bufferRef = useRef<number[]>([])
   const [bornText, setBornText] = useState('3')
   const [surviveText, setSurviveText] = useState('2,3')
   const [born, setBorn] = useState<number[]>(DEFAULT_BORN)
@@ -85,6 +86,7 @@ function App() {
     const cells = vertices.map(() => (Math.random() > 0.5 ? 1 : 0))
     cellsRef.current = cells
     neighborsRef.current = neighbors
+    bufferRef.current = new Array(cells.length).fill(0)
     const meshes = vertices.map((v, i) => {
       const material = cells[i] ? aliveMaterial.clone() : deadMaterial.clone()
       const sphere = new THREE.Mesh(sphereGeometry, material)
@@ -127,6 +129,7 @@ function App() {
         cellsRef.current = []
         neighborsRef.current = []
         meshesRef.current = []
+        bufferRef.current = []
         container.removeChild(renderer.domElement)
       }
   }, [])
@@ -134,7 +137,9 @@ function App() {
   const tick = useCallback(() => {
     const cells = cellsRef.current
     const neighbors = neighborsRef.current
-    const next = step(cells, neighbors, born, survive)
+    const buffer = bufferRef.current
+    const next = step(cells, neighbors, born, survive, buffer)
+    bufferRef.current = cells
     cellsRef.current = next
     meshesRef.current.forEach((mesh, i) => {
       const mat = mesh.material as THREE.MeshBasicMaterial

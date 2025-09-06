@@ -100,9 +100,21 @@ export function step(
   neighbors: number[][],
   born: number[],
   survive: number[],
+  out?: number[],
 ): number[] {
-  return cells.map((cell, i) => {
+  const result = out ?? new Array<number>(cells.length)
+  if (result.length !== cells.length) result.length = cells.length
+
+  for (let i = 0; i < cells.length; i++) {
     const count = neighbors[i].reduce((sum, n) => sum + cells[n], 0)
-    return cell ? (survive.includes(count) ? 1 : 0) : born.includes(count) ? 1 : 0
-  })
+    result[i] = cells[i]
+      ? survive.includes(count)
+        ? 1
+        : 0
+      : born.includes(count)
+        ? 1
+        : 0
+  }
+
+  return result
 }

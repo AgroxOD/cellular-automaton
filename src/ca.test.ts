@@ -85,4 +85,13 @@ describe('step', () => {
     const next = step(cells, neighborsOver, born, survive)
     expect(next[0]).toBe(0)
   })
+
+  it('writes output to provided array', () => {
+    const cells = [0, 1, 1, 1]
+    const out: number[] = []
+    const next = step(cells, tetraNeighbors, born, survive, out)
+    expect(next).toBe(out)
+    expect(next[0]).toBe(1)
+    expect(cells[0]).toBe(0)
+  })
 })
