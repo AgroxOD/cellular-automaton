@@ -3,11 +3,25 @@ import * as THREE from 'three'
 import { generateDodecahedronNeighbors, step } from './ca'
 import './App.css'
 
-function parseRule(text: string): number[] {
-  return text
-    .split(',')
-    .map((s) => parseInt(s.trim(), 10))
-    .filter((n) => !Number.isNaN(n))
+const DEFAULT_BORN = [3]
+const DEFAULT_SURVIVE = [2, 3]
+
+// eslint-disable-next-line react-refresh/only-export-components
+export function parseRule(text: string): { values: number[]; valid: boolean } {
+  const parts = text.split(',')
+  const nums: number[] = []
+  let valid = parts.length > 0
+  for (const part of parts) {
+    const n = parseInt(part.trim(), 10)
+    if (Number.isNaN(n) || n < 0 || n > 12) {
+      valid = false
+      continue
+    }
+    nums.push(n)
+  }
+  const values = Array.from(new Set(nums))
+  if (values.length === 0) valid = false
+  return { values, valid }
 }
 
 function App() {
@@ -17,16 +31,32 @@ function App() {
   const meshesRef = useRef<THREE.Mesh[]>([])
   const [bornText, setBornText] = useState('3')
   const [surviveText, setSurviveText] = useState('2,3')
-  const [born, setBorn] = useState<number[]>([3])
-  const [survive, setSurvive] = useState<number[]>([2, 3])
+  const [born, setBorn] = useState<number[]>(DEFAULT_BORN)
+  const [survive, setSurvive] = useState<number[]>(DEFAULT_SURVIVE)
+  const [bornError, setBornError] = useState<string | null>(null)
+  const [surviveError, setSurviveError] = useState<string | null>(null)
   const [running, setRunning] = useState(false)
 
   useEffect(() => {
-    setBorn(parseRule(bornText))
+    const { values, valid } = parseRule(bornText)
+    if (valid) {
+      setBorn(values)
+      setBornError(null)
+    } else {
+      setBorn(DEFAULT_BORN)
+      setBornError('Invalid born rule')
+    }
   }, [bornText])
 
   useEffect(() => {
-    setSurvive(parseRule(surviveText))
+    const { values, valid } = parseRule(surviveText)
+    if (valid) {
+      setSurvive(values)
+      setSurviveError(null)
+    } else {
+      setSurvive(DEFAULT_SURVIVE)
+      setSurviveError('Invalid survive rule')
+    }
   }, [surviveText])
 
   useEffect(() => {
@@ -128,6 +158,7 @@ function App() {
             value={bornText}
             onChange={(e) => setBornText(e.target.value)}
           />
+          {bornError && <span style={{ color: 'red' }}>{bornError}</span>}
         </label>
         <label>
           survive:
@@ -135,6 +166,7 @@ function App() {
             value={surviveText}
             onChange={(e) => setSurviveText(e.target.value)}
           />
+          {surviveError && <span style={{ color: 'red' }}>{surviveError}</span>}
         </label>
         <button onClick={() => setRunning((r) => !r)}>{running ? 'Stop' : 'Start'}</button>
         <button onClick={tick}>Step</button>
