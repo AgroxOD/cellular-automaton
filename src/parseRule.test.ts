@@ -14,6 +14,12 @@ describe('parseRule', () => {
     expect(result.valid).toBe(true)
   })
 
+  it('sorts values ascending', () => {
+    const result = parseRule('3,1,2')
+    expect(result.values).toEqual([1, 2, 3])
+    expect(result.valid).toBe(true)
+  })
+
   it('detects invalid inputs', () => {
     const result = parseRule('a,b')
     expect(result.values).toEqual([])
