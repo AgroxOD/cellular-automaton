@@ -18,6 +18,12 @@ describe('generateIcosahedronNeighbors', () => {
       })
     })
   })
+  it('neighbor order is deterministic', () => {
+    neighbors.forEach((list) => {
+      const sorted = [...list].sort((a, b) => a - b)
+      expect(list).toEqual(sorted)
+    })
+  })
 })
 
 describe('generateDodecahedronNeighbors', () => {
@@ -35,6 +41,12 @@ describe('generateDodecahedronNeighbors', () => {
       unique.forEach((n) => {
         expect(neighbors[n]).toContain(i)
       })
+    })
+  })
+  it('neighbor order is deterministic', () => {
+    neighbors.forEach((list) => {
+      const sorted = [...list].sort((a, b) => a - b)
+      expect(list).toEqual(sorted)
     })
   })
 })
