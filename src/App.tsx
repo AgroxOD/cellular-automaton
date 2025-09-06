@@ -1,28 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { createRhombicDodecahedronGeometry, generateFCCLattice, step } from './ca'
+import { parseRule } from './ruleParser'
 import './App.css'
 
 const DEFAULT_BORN = [3]
 const DEFAULT_SURVIVE = [2, 3]
-
-// eslint-disable-next-line react-refresh/only-export-components
-export function parseRule(text: string): { values: number[]; valid: boolean } {
-  const parts = text.split(',')
-  const nums: number[] = []
-  let valid = parts.length > 0
-  for (const part of parts) {
-    const n = parseInt(part.trim(), 10)
-    if (Number.isNaN(n) || n < 0 || n > 12) {
-      valid = false
-      continue
-    }
-    nums.push(n)
-  }
-  const values = Array.from(new Set(nums))
-  if (values.length === 0) valid = false
-  return { values, valid }
-}
 
 function App() {
   const mountRef = useRef<HTMLDivElement | null>(null)
