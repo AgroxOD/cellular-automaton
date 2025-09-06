@@ -184,13 +184,16 @@ export function step(
   const result = out ?? new Array<number>(cells.length)
   if (result.length !== cells.length) result.length = cells.length
 
+  const bornSet = new Set(born)
+  const surviveSet = new Set(survive)
+
   for (let i = 0; i < cells.length; i++) {
     const count = neighbors[i].reduce((sum, n) => sum + cells[n], 0)
     result[i] = cells[i]
-      ? survive.includes(count)
+      ? surviveSet.has(count)
         ? 1
         : 0
-      : born.includes(count)
+      : bornSet.has(count)
         ? 1
         : 0
   }
