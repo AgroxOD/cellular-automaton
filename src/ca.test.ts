@@ -71,6 +71,10 @@ describe('generateFCCLattice', () => {
   it('positions have even parity', () => {
     coords.forEach(([x, y, z]) => expect(Math.abs((x + y + z) % 2)).toBe(0))
   })
+  it('has expected number of unique positions', () => {
+    const seen = new Set(coords.map((c) => c.join(',')))
+    expect(seen.size).toBe(13)
+  })
   it('center has 12 neighbors', () => {
     const center = coords.findIndex(([x, y, z]) => x === 0 && y === 0 && z === 0)
     expect(neighbors[center]).toHaveLength(12)
@@ -88,6 +92,17 @@ describe('generateFCCLattice', () => {
     neighbors.forEach((list) => {
       const sorted = [...list].sort((a, b) => a - b)
       expect(list).toEqual(sorted)
+    })
+  })
+  it('works for larger radius', () => {
+    const { positions: pos2, neighbors: neigh2 } = generateFCCLattice(2)
+    expect(pos2).toHaveLength(63)
+    const unique = new Set(pos2.map((v) => [v.x, v.y, v.z].join(',')))
+    expect(unique.size).toBe(pos2.length)
+    neigh2.forEach((list, i) => {
+      list.forEach((n) => {
+        expect(neigh2[n]).toContain(i)
+      })
     })
   })
 })

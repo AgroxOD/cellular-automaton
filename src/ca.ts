@@ -123,8 +123,11 @@ export function generateFCCLattice(radius: number): {
   neighbors: number[][]
 } {
   const positions: THREE.Vector3[] = []
-  const indexMap = new Map<string, number>()
+  const indexMap = new Map<number, number>()
   const neighborMap: number[][] = []
+  const size = radius * 2 + 1
+  const hash = (x: number, y: number, z: number): number =>
+    ((x + radius) * size + (y + radius)) * size + (z + radius)
 
   for (let x = -radius; x <= radius; x++) {
     for (let y = -radius; y <= radius; y++) {
@@ -133,7 +136,7 @@ export function generateFCCLattice(radius: number): {
         const v = new THREE.Vector3(x, y, z)
         const idx = positions.length
         positions.push(v)
-        indexMap.set(v.toArray().join(','), idx)
+        indexMap.set(hash(x, y, z), idx)
         neighborMap[idx] = []
       }
     }
@@ -156,8 +159,7 @@ export function generateFCCLattice(radius: number): {
 
   positions.forEach((v, i) => {
     offsets.forEach(([dx, dy, dz]) => {
-      const key = [v.x + dx, v.y + dy, v.z + dz].join(',')
-      const idx = indexMap.get(key)
+      const idx = indexMap.get(hash(v.x + dx, v.y + dy, v.z + dz))
       if (idx !== undefined) neighborMap[i].push(idx)
     })
     neighborMap[i].sort((a, b) => a - b)
