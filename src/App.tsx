@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
-import { generateIcosahedronNeighbors, step } from './ca'
+import { generateDodecahedronNeighbors, step } from './ca'
 import './App.css'
 
 function parseRule(text: string): number[] {
@@ -47,7 +47,7 @@ function App() {
     const dodecahedron = new THREE.Mesh(dodecaGeometry, dodecaMaterial)
     scene.add(dodecahedron)
 
-    const { vertices, neighbors } = generateIcosahedronNeighbors()
+    const { vertices, neighbors } = generateDodecahedronNeighbors()
     const sphereGeometry = new THREE.SphereGeometry(0.05, 16, 16)
     const deadMaterial = new THREE.MeshBasicMaterial({ color: 0x222222 })
     const aliveMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 })
