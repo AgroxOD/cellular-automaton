@@ -37,6 +37,7 @@ function App() {
   const [bornError, setBornError] = useState<string | null>(null)
   const [surviveError, setSurviveError] = useState<string | null>(null)
   const [running, setRunning] = useState(false)
+  const [radius, setRadius] = useState(3)
 
   useEffect(() => {
     const { values, valid } = parseRule(bornText)
@@ -73,7 +74,7 @@ function App() {
     renderer.setSize(width, height)
     container.appendChild(renderer.domElement)
 
-    const { positions, neighbors } = generateFCCLattice(3)
+    const { positions, neighbors } = generateFCCLattice(radius)
     const cellGeometry = createRhombicDodecahedronGeometry(0.2)
     const material = new THREE.MeshStandardMaterial({ vertexColors: true, metalness: 0, roughness: 1 })
     const mesh = new THREE.InstancedMesh(
@@ -137,7 +138,7 @@ function App() {
         bufferRef.current = []
         container.removeChild(renderer.domElement)
       }
-  }, [])
+  }, [radius])
 
   const tick = useCallback(() => {
     const cells = cellsRef.current
@@ -167,6 +168,21 @@ function App() {
     <div>
       <div ref={mountRef} className="scene-container" />
       <div className="controls">
+        <label>
+          radius:
+          <input
+            type="number"
+            min={1}
+            value={radius}
+            onChange={(e) =>
+              setRadius(
+                Number.isNaN(e.target.valueAsNumber)
+                  ? 1
+                  : Math.max(1, Math.round(e.target.valueAsNumber)),
+              )
+            }
+          />
+        </label>
         <label>
           born:
           <input
