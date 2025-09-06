@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { generateIcosahedronNeighbors, step } from './ca'
+import { generateDodecahedronNeighbors, generateIcosahedronNeighbors, step } from './ca'
 
 describe('generateIcosahedronNeighbors', () => {
   const { neighbors } = generateIcosahedronNeighbors()
@@ -8,6 +8,23 @@ describe('generateIcosahedronNeighbors', () => {
   })
   it('each vertex has 5 neighbors', () => {
     neighbors.forEach((list) => expect(list).toHaveLength(5))
+  })
+  it('neighbor relation is symmetric', () => {
+    neighbors.forEach((list, i) => {
+      list.forEach((n) => {
+        expect(neighbors[n]).toContain(i)
+      })
+    })
+  })
+})
+
+describe('generateDodecahedronNeighbors', () => {
+  const { neighbors } = generateDodecahedronNeighbors()
+  it('creates 20 vertices', () => {
+    expect(neighbors).toHaveLength(20)
+  })
+  it('each vertex has 3 neighbors', () => {
+    neighbors.forEach((list) => expect(list).toHaveLength(3))
   })
   it('neighbor relation is symmetric', () => {
     neighbors.forEach((list, i) => {
