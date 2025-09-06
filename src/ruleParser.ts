@@ -10,7 +10,7 @@ export function parseRule(text: string): { values: number[]; valid: boolean } {
     }
     nums.push(n)
   }
-  const values = Array.from(new Set(nums))
+  const values = Array.from(new Set(nums)).sort((a, b) => a - b)
   if (values.length === 0) valid = false
   return { values, valid }
 }
