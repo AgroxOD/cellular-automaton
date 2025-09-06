@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
-import { generateFCCLattice, step } from './ca'
+import { createRhombicDodecahedronGeometry, generateFCCLattice, step } from './ca'
 import './App.css'
 
 const DEFAULT_BORN = [3]
@@ -74,13 +74,18 @@ function App() {
     container.appendChild(renderer.domElement)
 
     const { positions, neighbors } = generateFCCLattice(3)
-    const sphereGeometry = new THREE.SphereGeometry(0.2, 16, 16)
-    const material = new THREE.MeshBasicMaterial({ vertexColors: true })
+    const cellGeometry = createRhombicDodecahedronGeometry(0.2)
+    const material = new THREE.MeshStandardMaterial({ vertexColors: true, metalness: 0, roughness: 1 })
     const mesh = new THREE.InstancedMesh(
-      sphereGeometry,
+      cellGeometry,
       material,
       positions.length,
     )
+    const ambient = new THREE.AmbientLight(0xffffff, 0.4)
+    scene.add(ambient)
+    const dir = new THREE.DirectionalLight(0xffffff, 0.8)
+    dir.position.set(5, 5, 5)
+    scene.add(dir)
     const cells = positions.map(() => (Math.random() > 0.5 ? 1 : 0))
     cellsRef.current = cells
     neighborsRef.current = neighbors
@@ -90,7 +95,7 @@ function App() {
     positions.forEach((v, i) => {
       matrix.setPosition(v)
       mesh.setMatrixAt(i, matrix)
-      color.set(cells[i] ? 0xff0000 : 0x222222)
+      color.set(cells[i] ? 0x00ff00 : 0x444444)
       mesh.setColorAt(i, color)
     })
     mesh.instanceMatrix.needsUpdate = true
@@ -145,7 +150,7 @@ function App() {
     if (mesh && mesh.instanceColor) {
       const color = new THREE.Color()
       next.forEach((v, i) => {
-        color.set(v ? 0xff0000 : 0x222222)
+        color.set(v ? 0x00ff00 : 0x444444)
         mesh.setColorAt(i, color)
       })
       mesh.instanceColor.needsUpdate = true

@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { ConvexGeometry } from 'three/examples/jsm/geometries/ConvexGeometry.js'
 
 export function generateIcosahedronNeighbors(): {
   vertices: THREE.Vector3[]
@@ -93,6 +94,28 @@ export function generateDodecahedronNeighbors(): {
   })
 
   return { vertices, neighbors: neighborMap }
+}
+
+export function createRhombicDodecahedronGeometry(size = 1): THREE.BufferGeometry {
+  const vertices = [
+    new THREE.Vector3(1, 0, 0),
+    new THREE.Vector3(-1, 0, 0),
+    new THREE.Vector3(0, 1, 0),
+    new THREE.Vector3(0, -1, 0),
+    new THREE.Vector3(0, 0, 1),
+    new THREE.Vector3(0, 0, -1),
+    new THREE.Vector3(0.5, 0.5, 0.5),
+    new THREE.Vector3(0.5, 0.5, -0.5),
+    new THREE.Vector3(0.5, -0.5, 0.5),
+    new THREE.Vector3(0.5, -0.5, -0.5),
+    new THREE.Vector3(-0.5, 0.5, 0.5),
+    new THREE.Vector3(-0.5, 0.5, -0.5),
+    new THREE.Vector3(-0.5, -0.5, 0.5),
+    new THREE.Vector3(-0.5, -0.5, -0.5),
+  ]
+  const geometry = new ConvexGeometry(vertices)
+  geometry.scale(size, size, size)
+  return geometry
 }
 
 export function generateFCCLattice(radius: number): {
