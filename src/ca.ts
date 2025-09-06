@@ -32,7 +32,15 @@ export function generateIcosahedronNeighbors(): {
   }
 
   neighborMap.forEach((arr, i) => {
-    neighborMap[i] = Array.from(new Set(arr))
+    neighborMap[i] = Array.from(new Set(arr)).sort((a, b) => a - b)
+  })
+
+  neighborMap.forEach((arr, i) => {
+    arr.forEach((j) => {
+      if (!neighborMap[j].includes(i)) {
+        throw new Error(`Neighbor symmetry broken between ${i} and ${j}`)
+      }
+    })
   })
 
   return { vertices, neighbors: neighborMap }
@@ -69,11 +77,19 @@ export function generateDodecahedronNeighbors(): {
   }
 
   neighborMap.forEach((arr, i) => {
-    const dedup = Array.from(new Set(arr))
+    const dedup = Array.from(new Set(arr)).sort((a, b) => a - b)
     if (dedup.length !== 3) {
       throw new Error(`Vertex ${i} expected 3 neighbors, got ${dedup.length}`)
     }
     neighborMap[i] = dedup
+  })
+
+  neighborMap.forEach((arr, i) => {
+    arr.forEach((j) => {
+      if (!neighborMap[j].includes(i)) {
+        throw new Error(`Neighbor symmetry broken between ${i} and ${j}`)
+      }
+    })
   })
 
   return { vertices, neighbors: neighborMap }
