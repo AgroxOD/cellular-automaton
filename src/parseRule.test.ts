@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseRule } from './App'
+import { parseRule } from './ruleParser'
 
 describe('parseRule', () => {
   it('filters negatives and numbers greater than 12', () => {
