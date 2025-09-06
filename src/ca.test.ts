@@ -1,5 +1,19 @@
+import * as THREE from 'three'
 import { describe, expect, it } from 'vitest'
-import { generateDodecahedronNeighbors, generateIcosahedronNeighbors, generateFCCLattice, step } from './ca'
+import { createRhombicDodecahedronGeometry, generateDodecahedronNeighbors, generateIcosahedronNeighbors, generateFCCLattice, step } from './ca'
+
+describe('createRhombicDodecahedronGeometry', () => {
+  const geometry = createRhombicDodecahedronGeometry()
+  it('has 14 unique vertices', () => {
+    const pos = geometry.getAttribute('position') as THREE.BufferAttribute
+    const vertices = new Set<string>()
+    for (let i = 0; i < pos.count; i++) {
+      const v = new THREE.Vector3().fromBufferAttribute(pos, i)
+      vertices.add(v.toArray().map((n) => n.toFixed(3)).join(','))
+    }
+    expect(vertices.size).toBe(14)
+  })
+})
 
 describe('generateIcosahedronNeighbors', () => {
   const { neighbors } = generateIcosahedronNeighbors()
