@@ -11,7 +11,9 @@ describe('generateIcosahedronNeighbors', () => {
   })
   it('neighbor relation is symmetric', () => {
     neighbors.forEach((list, i) => {
-      list.forEach((n) => {
+      const unique = new Set(list)
+      expect(unique.size).toBe(list.length)
+      unique.forEach((n) => {
         expect(neighbors[n]).toContain(i)
       })
     })
@@ -28,7 +30,9 @@ describe('generateDodecahedronNeighbors', () => {
   })
   it('neighbor relation is symmetric', () => {
     neighbors.forEach((list, i) => {
-      list.forEach((n) => {
+      const unique = new Set(list)
+      expect(unique.size).toBe(list.length)
+      unique.forEach((n) => {
         expect(neighbors[n]).toContain(i)
       })
     })
