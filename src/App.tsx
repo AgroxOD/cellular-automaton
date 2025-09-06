@@ -81,10 +81,24 @@ function App() {
     }
     window.addEventListener('resize', handleResize)
 
-    return () => {
-      window.removeEventListener('resize', handleResize)
-      container.removeChild(renderer.domElement)
-    }
+      return () => {
+        window.removeEventListener('resize', handleResize)
+        renderer.dispose()
+        dodecaGeometry.dispose()
+        dodecaMaterial.dispose()
+        meshesRef.current.forEach((mesh) => {
+          mesh.geometry.dispose()
+          if (Array.isArray(mesh.material)) {
+            mesh.material.forEach((m) => m.dispose())
+          } else {
+            mesh.material.dispose()
+          }
+        })
+        cellsRef.current = []
+        neighborsRef.current = []
+        meshesRef.current = []
+        container.removeChild(renderer.domElement)
+      }
   }, [])
 
   const tick = useCallback(() => {
